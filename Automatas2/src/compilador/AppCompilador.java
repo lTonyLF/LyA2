@@ -18,7 +18,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 public class AppCompilador extends JFrame implements ActionListener{
-	// Componentes 
+	// Componentes aaaa
 	private JMenuBar barraMenu;
 	private JMenu menuArchivo;
 	// Menu Archivo
