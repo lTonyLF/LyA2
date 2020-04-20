@@ -3,7 +3,7 @@ package compilador;
 
 public class Identificador {
 
-	
+	//
 	@Override
 	public String toString() {
 		return "Identificador [nombre=" + nombre + ", valor=" + valor + ", tipo=" + tipo + ", alcance=" + alcance

@@ -12,7 +12,7 @@ public class Probalista {
 		while(Aux !=null){
 			System.out.println(Aux.dato);
 			Aux=Aux.siguiente;
-		}
+		}//a
 	}
 
 }

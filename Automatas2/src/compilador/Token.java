@@ -15,7 +15,7 @@ public class Token
 	private final static String types[]= 
 	{
 	"Modificador",
-	"Palabra resevada",
+	"Palabra resevada",//aa
 	"Tipo de dato",
 	"Simbolo",
 	"Operador logico",

@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 public class Analisis
 {
 	int renglon=1;
-	ArrayList<String> impresion; //para la salida
+	ArrayList<String> impresion; //para la salidaa
 	ArrayList<Identificador> identi = new ArrayList<Identificador>();
 	ArrayList<String> aux= new ArrayList<String>();
 	ListaDoble<Token> tokens;
