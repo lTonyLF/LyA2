@@ -4,8 +4,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
-
-import com.sun.xml.internal.bind.v2.runtime.Name;
 public class Analisis
 {
 	int renglon=1;
@@ -15,14 +13,9 @@ public class Analisis
 	ListaDoble<Token> tokens;
 	final Token vacio=new Token("", 9,0);
 	boolean bandera=true;
-	ArrayList<Arbol> arbol = new ArrayList<Arbol>();
-	ArrayList<String> expresion = new ArrayList<String>();
 
 	public ArrayList<Identificador> getIdenti() {
 		return identi;
-	}
-	public ArrayList<Arbol> getIdenti2() {
-		return arbol ;
 	}
 	public Analisis(String ruta) {//Recibe el nombre del archivo de text
 		analisaCodigo(ruta);
@@ -61,7 +54,7 @@ public class Analisis
 			JOptionPane.showMessageDialog(null,"No se encontro el archivo favor de checar la ruta","Alerta",JOptionPane.ERROR_MESSAGE);
 		}
 	}
-	// 
+	// La neta le falta hacer mantenimiento pero funciona
 	public Token analisisSintactio(NodoDoble<Token> nodo) {
 		Token  to;
 		if(nodo!=null) // si no llego al ultimo de la lista
@@ -101,326 +94,15 @@ public class Analisis
 					}
 				break;
 			case Token.SIMBOLO:
-				if (to.getValor().equals(";")){
-					int aux=0;
-					boolean bandera=false;
-					//Recorridos de los arboles
-					if ((nodo.anterior.anterior.anterior.anterior.dato.getTipo()==Token.CONSTANTE 
-							&& nodo.anterior.anterior.anterior.dato.getTipo()==Token.OPERADOR_ARITMETICO && nodo.anterior.anterior.dato.getTipo()==Token.CONSTANTE && nodo.dato.getValor().contains(")"))  ||
-							(nodo.anterior.anterior.anterior.anterior.dato.getTipo()==Token.CONSTANTE && nodo.anterior.anterior.anterior.dato.getTipo()==Token.SIMBOLO && nodo.anterior.anterior.dato.getTipo()==Token.OPERADOR_ARITMETICO
-							&& nodo.anterior.dato.getTipo()==Token.CONSTANTE) || (nodo.anterior.anterior.anterior.dato.getTipo()==Token.CONSTANTE  && nodo.anterior.anterior.dato.getTipo()==Token.OPERADOR_ARITMETICO
-							&& nodo.anterior.dato.getTipo()==Token.CONSTANTE)){
-
-						NodoDoble<Token> nodoaux = nodo;
-						NodoDoble<Token> nodoaux2 = nodo;
-						NodoDoble<Token> nodoaux3 = nodo;
-						while(nodoaux!=null){
-							String aux2 = nodoaux.anterior.dato.getValor();
-							if(aux2.contains("="))
-								break;
-
-							nodoaux = nodoaux.anterior;
-						}
-
-
-						while(nodoaux!=null){
-							String aux2 = nodoaux.dato.getValor();
-							if(aux2.contains(";"))
-								break;
-
-							expresion.add(aux2);
-							nodoaux = nodoaux.siguiente;
-						}
-						
-						//Declaracion de Variables en Ensamblador
-						System.out.println("        TITLE Ejemplo\r\n" + 
-								"        \r\n" + 
-								"        .MODEL  SMALL\r\n" + 
-								"        .486\r\n" + 
-								"        .STACK \r\n" + 
-								"        \r\n" + 
-								"        .DATA");
-						System.out.println("temporal1\t"+"DB\t"+"0");
-						System.out.println("temporal2\t"+"DB\t"+"0");
-						System.out.println("temporal3\t"+"DB\t"+"0");
-						System.out.println("temporal4\t"+"DB\t"+"0");
-						System.out.println("temporal5\t"+"DB\t"+"0");
-						System.out.println("x\t"+"DB\t"+"0");
-
-
-						System.out.println(".CODE\r\n" + 
-								"MAIN   PROC    FAR\r\n" + 
-								"       .STARTUP");
-						System.out.println();
-						System.out.println();
-
-
-						ArrayList<String> expresion2 = new ArrayList<String>(expresion);
-						int Resultado=0;
-						int contador =1;
-						//Primero revisa si la Expresion tiene parentesis parentesis
-						for (int i = 0; i < expresion.size(); i++) {
-							if(expresion.get(i).contains("(") ){
-								if (expresion.get(i).contains("(")){
-									int aux5 = i;
-									int aux6 = 0 ;
-									boolean banderaParentesis = false;
-
-									for (int j = 0; j < expresion.size(); j++) {
-										if(expresion.get(j).contains(")")){
-											aux6 = j;
-											break;
-										}
-									}
-
-									while(!banderaParentesis){
-										for (int j = aux5; j < aux6; j++) {
-											if(expresion.get(j).contains("/")){
-												Resultado =  dividir(expresion.get(j-1), expresion.get(j+1));
-												expresion2.set(j,"temporal"+contador);
-												arbol.add(new Arbol("/",expresion2.get(j-1),expresion2.get(j+1),expresion2.get(j)));
-												expresion2.remove(j+1);
-												expresion2.remove(j-1);
-
-												expresion.set(j,Resultado+"" );
-												expresion.remove(j+1);
-												expresion.remove(j-1);
-
-												aux6 = aux6 - 2;
-												contador++;
-											}
-											//Multiplicacion
-											if (expresion.get(j).contains("*")){
-												
-												Resultado =  multiplicar(expresion.get(j-1), expresion.get(j+1));
-												expresion2.set(j,"temporal"+contador);
-												
-												arbol.add(new Arbol("*",expresion2.get(j-1),expresion2.get(j+1),expresion2.get(j)));
-												expresion2.remove(j+1);
-												expresion2.remove(j-1);
-
-												expresion.set(j,Resultado+"" );
-												expresion.remove(j+1);
-												expresion.remove(j-1);
-												aux6 = aux6 - 2;
-
-												contador++;
-											}
-										}
-										//Suma
-										if (expresion.get(i+2).contains("+")){
-											Resultado =  sumar(expresion.get(i+1), expresion.get(i+3));
-											expresion2.set(i+2,"temporal"+contador);
-											arbol.add(new Arbol("+",expresion2.get(i+1),expresion2.get(i+3),expresion2.get(i+2)));
-											expresion2.remove(i+3);
-											expresion2.remove(i+1);
-
-											expresion.set(i+1,Resultado+"" );
-											expresion.remove(i+2);
-											expresion.remove(i+2);
-											contador++;
-										}
-										if (expresion.get(i+2).contains("-")){
-											Resultado =  restar(expresion.get(i+1), expresion.get(i+3));
-											expresion2.set(i+2,"temporal"+contador);
-											arbol.add(new Arbol("-",expresion2.get(i+1),expresion2.get(i+3),expresion2.get(i+2)));
-											expresion2.remove(i+3);
-											expresion2.remove(i+1);
-
-											expresion.set(i+1,Resultado+"" );
-											expresion.remove(i+2);
-											expresion.remove(i+2);
-
-											contador++;
-										}
-
-										if(expresion.get(i+2).contains(")"))	{
-											expresion.remove(i+2);
-											expresion.remove(i);
-											expresion2.remove(i+2);
-											expresion2.remove(i);
-											banderaParentesis = true;
-										}
-									}
-								}
-							}
-						}
-
-
-
-						for (int i = 0; i < expresion.size(); i++) {
-							if (expresion.get(i).contains("/")){
-								Resultado =  dividir(expresion.get(i-1), expresion.get(i+1));
-								expresion2.set(i,"temporal"+contador);
-								arbol.add(new Arbol("/",expresion2.get(i-1),expresion2.get(i+1),expresion2.get(i)));
-								System.out.println("MOV AL, "+expresion2.get(i-1));
-								System.out.println("MOV BL, "+expresion2.get(i+1));
-								System.out.println("DIV BL");
-								System.out.println("MOV temporal"+contador+", AL");
-								System.out.println(";temporal"+contador+"= "+Resultado);
-								System.out.println();
-								expresion2.remove(i+1);
-								expresion2.remove(i-1);
-
-								expresion.set(i-1,Resultado+"" );
-								expresion.remove(i);
-								expresion.remove(i);
-								i--;
-								contador++;
-							}
-							else if(expresion.get(i).contains("*") || expresion.get(i).contains("/")){
-								if (expresion.get(i).contains("*")){
-									Resultado =  multiplicar(expresion.get(i-1), expresion.get(i+1));
-									expresion2.set(i,"temporal"+contador);
-									arbol.add(new Arbol("*",expresion2.get(i-1),expresion2.get(i+1),expresion2.get(i)));
-									System.out.println("MOV AL, "+expresion2.get(i-1));
-									System.out.println("MOV BL, "+expresion2.get(i+1));
-									System.out.println("MUL BL");
-									System.out.println("MOV temporal"+contador+", AL");
-									System.out.println(";temporal"+contador+"= "+Resultado);
-									System.out.println();
-									expresion2.remove(i+1);
-									expresion2.remove(i-1);
-									expresion.set(i-1,Resultado+"" );
-									System.out.println();
-									expresion.remove(i);
-									expresion.remove(i);
-									i--;
-									contador++;
-								}
-
-							}
-
-						}
-
-						for (int i = 0; i < expresion.size(); i++) {
-							if(expresion.get(i).contains("+") || expresion.get(i).contains("-")){
-								if (expresion.get(i).contains("+")){
-									Resultado =  sumar(expresion.get(i-1), expresion.get(i+1));
-									expresion2.set(i,"temporal"+contador);
-									arbol.add(new Arbol("+",expresion2.get(i-1),expresion2.get(i+1),expresion2.get(i)));
-									System.out.println("MOV AL, "+expresion2.get(i-1));
-									System.out.println("MOV AH, "+expresion2.get(i+1));
-									System.out.println("ADD AL, AH");
-									System.out.println("MOV temporal"+contador+", AL");
-									System.out.println(";temporal"+contador+"= "+Resultado);
-									System.out.println();
-									
-									expresion2.remove(i+1);
-									expresion2.remove(i-1);
-									expresion.set(i-1,Resultado+"" );
-									expresion.remove(i);
-									expresion.remove(i);
-									i--;
-									contador++;
-								}
-
-								else if (expresion.get(i).contains("-")){
-									if(expresion.get(i).contains("-")){
-										Resultado =  restar(expresion.get(i-1), expresion.get(i+1));
-										expresion2.set(i,"temporal"+contador);
-										arbol.add(new Arbol("-",expresion2.get(i-1),expresion2.get(i+1),expresion2.get(i)));
-										System.out.println("MOV AL, "+expresion2.get(i-1));
-										System.out.println("MOV AH, "+expresion2.get(i+1));
-										System.out.println("SUB AL, AH");
-										System.out.println("MOV temporal"+contador+", AL");
-										System.out.println(";temporal"+contador+"= "+Resultado);
-										System.out.println();
-										
-										expresion2.remove(i+1);
-										expresion2.remove(i-1);
-
-										expresion.set(i-1,Resultado+"" );
-										expresion.remove(i);
-										expresion.remove(i);
-										i--;
-										contador++;
-									}
-								}
-							}
-						}
-
-						int Tipo, nombre;
-						String auxTipo ="";
-						String varNombre = "";
-						while(nodoaux2!=null){
-							Tipo = nodoaux2.anterior.dato.getTipo();
-							if(Tipo==2 ){
-								auxTipo = nodoaux2.anterior.dato.getValor();
-								break;
-							}
-							nodoaux2 = nodoaux2.anterior;
-						}
-
-						while(nodoaux3!=null){
-							nombre = nodoaux3.anterior.dato.getTipo();
-							if(nombre==7){
-								varNombre = nodoaux3.anterior.dato.getValor();
-								break;
-							}
-							nodoaux3 = nodoaux3.anterior;
-						}
-						arbol.add(new Arbol("=",expresion2.get(0)," ",varNombre));
-						identi.add(new Identificador(varNombre,Resultado+"",auxTipo,"Global",to.getLinea()));
-						System.out.println("MOV AL, temporal"+(contador-1));
-						System.out.println("MOV "+varNombre+", AL");
-						System.out.println(";"+varNombre+"= "+Resultado);
-						System.out.println("MOV BX, 0001H\r\n" + 
-								"    ADD "+varNombre+",30H\r\n" + 
-								"    MOV DL, "+varNombre+"\r\n" + 
-								"    MOV AH, 02H\r\n" + 
-								"    INT 21H");
-						System.out.println(" .EXIT\r\n" + 
-								"      \r\n" + 
-								"MAIN ENDP\r\n" + 
-								"     END    ");
-						expresion.remove(0);
-						expresion2.remove(0);
-					}
-
-					
-					
-					
-					else if (nodo.anterior.anterior.anterior.dato.getTipo()==Token.IDENTIFICADOR
-							&&nodo.anterior.anterior.dato.getTipo()==Token.SIMBOLO
-							&&nodo.anterior.dato.getTipo()==Token.CONSTANTE)
-					{
-						for (int i = 0; i < identi.size(); i++) {
-							if(identi.get(i).getNombre().contains(nodo.anterior.anterior.anterior.dato.getValor())){
-								identi.get(i).setValor(nodo.anterior.dato.getValor());
-								bandera=true;
-							}
-						}
-						if(!bandera){
-							impresion.add("Error sintactico en linea "+to.getLinea()+ " se esperaba un Tipo de Dato");
-						}
-
-					}
-					else if (nodo.anterior.anterior.anterior.dato.getTipo()==Token.IDENTIFICADOR
-							&&nodo.anterior.anterior.dato.getTipo()==Token.SIMBOLO
-							&&nodo.anterior.dato.getTipo()==Token.CONSTANTE)
-					{
-
-						for (int i = 0; i < identi.size(); i++) {
-							if(identi.get(i).getNombre().contains(nodo.anterior.anterior.anterior.dato.getValor())){
-								identi.get(i).setValor(nodo.anterior.dato.getValor());
-								bandera=true;
-							}
-						}
-
-						if(!bandera){
-							impresion.add("Error sintactico en linea "+to.getLinea()+ " se esperaba un Tipo de Dato");
-						}
-					}
-				} 
-
-				else if(to.getValor().equals("}")) 
+				// Verificar que el mismo numero de parentesis y llaves que abren sean lo mismo que los que cierran
+				if(to.getValor().equals("}")) 
 				{
 					if(cuenta("{")!=cuenta("}"))
 						impresion.add("Error sinatactico en la linea "+to.getLinea()+ " falta un {");
 				}else if(to.getValor().equals("{")) {
 					if(cuenta("{")!=cuenta("}"))
 						impresion.add("Error sinatactico en la linea "+to.getLinea()+ " falta un }");
+
 				}
 				else if(to.getValor().equals("(")) {
 					if(cuenta("(")!=cuenta(")"))
@@ -442,9 +124,19 @@ public class Analisis
 							impresion.add("Error sinatactico en la linea "+to.getLinea()+ " se esperaba una constante");
 						else {
 							if(nodo.anterior.anterior.dato.getTipo()==Token.TIPO_DATO)
-								
+								identi.add(new Identificador(nodo.anterior.dato.getValor(),nodo.siguiente.dato.getValor(),nodo.anterior.anterior.dato.getValor(),"Global",nodo.dato.getLinea()));
+							else
 								//Si el valor se repite
 								if(cuenta(nodo.anterior.dato.getValor())>=2){
+
+
+								}else {
+									//Si no encuentra una variable declarada
+									if(cuenta(nodo.anterior.dato.getValor())<2) {
+										impresion.add("Error sinatactico en linea "+to.getLinea()+ " variable no declarada");
+									}else {
+										impresion.add("Error sinatactico en linea "+to.getLinea()+ " se esperaba un tipo de dato");
+									}
 								}
 						}
 					}else
@@ -482,16 +174,16 @@ public class Analisis
 			case Token.OPERADOR_LOGICO:
 				// verificar que sea  'numero' + 'operador' + 'numero' 
 				if(nodo.anterior.dato.getTipo()!=Token.CONSTANTE) 
-					impresion.add("Error semantico en linea "+to.getLinea()+ " se esperaba una constante");
+					impresion.add("Error sinatactico en linea "+to.getLinea()+ " se esperaba una constante");
 				if(nodo.siguiente.dato.getTipo()!=Token.CONSTANTE)
 					impresion.add("Error sinatactico en linea "+to.getLinea()+ " se esperaba una constante");
 				break;
 
 			case Token.OPERADOR_ARITMETICO:
 				if(nodo.anterior.dato.getTipo()!=Token.CONSTANTE) 
-					impresion.add("Error semantico en linea "+to.getLinea()+ " se esperaba una constante");
+					impresion.add("Error sinatactico en linea "+to.getLinea()+ " se esperaba una constante");
 				if(nodo.siguiente.dato.getTipo()!=Token.CONSTANTE)
-					impresion.add("Error semantico en linea "+to.getLinea()+ " se esperaba una constante");
+					impresion.add("Error sinatactico en linea "+to.getLinea()+ " se esperaba una constante");
 
 				String aux1="", aux2="";
 				aux1=TipoDato(nodo.anterior.dato.getValor());
@@ -524,7 +216,7 @@ public class Analisis
 			tipo = Token.OPERADOR_LOGICO;
 		else if(Arrays.asList("+","-","*","/").contains(token))
 			tipo = Token.OPERADOR_ARITMETICO;
-		else if(Arrays.asList("true","false").contains(token)||Pattern.matches("^\\d+$",token)||Pattern.matches("[0-9]+.[0-9]+",token)||Pattern.matches("-[0-9]+$",token)  )    
+		else if(Arrays.asList("true","false").contains(token)||Pattern.matches("^\\d+$",token)||Pattern.matches("[0-9]+.[0-9]+",token)  )  
 			tipo = Token.CONSTANTE;
 		else if(token.equals("class")) 
 			tipo =Token.CLASE;
@@ -612,34 +304,7 @@ public class Analisis
 		}
 		return vacio;
 	}
-	
-	//Metodos para realizar las operaciones del arbol
-		public int multiplicar(String uno, String dos){
-			int mult =0;
-			mult = mult+Integer.parseInt(uno)*Integer.parseInt(dos);
-			return mult;
-		}
-
-	 	public int dividir(String uno, String dos){
-			int div =0;
-			div = div+ (int)( Integer.parseInt(uno)/Integer.parseInt(dos));
-			return div;
-		}
-
-	 	public int sumar (String uno, String dos){
-			int suma =0;
-			suma = suma+Integer.parseInt(uno)+Integer.parseInt(dos);
-			return suma;
-		}
-
-	 	public int restar(String uno, String dos){
-			int resta =0;
-			resta = resta+Integer.parseInt(uno)-Integer.parseInt(dos);
-			return resta;
-		}
-	
-	
-	 	//Metodos para validar los valores por medio de una cadena
+	//Metodos para validar los valores por medio de una cadena
 	public static boolean isNumeric(String cadena) {
 		try {
 			Integer.parseInt(cadena);
