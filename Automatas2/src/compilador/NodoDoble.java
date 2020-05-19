@@ -5,6 +5,6 @@ public class NodoDoble<E> {
 	NodoDoble<E> anterior;
 	public NodoDoble(E dato) {
 		this.dato=dato;
-	}//a
+	}
 	
 }
